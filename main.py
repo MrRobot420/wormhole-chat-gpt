@@ -1,101 +1,97 @@
 import random
 import pygame
+from src.player import Player
+from src.enemy import Enemy
 
-# Initialize pygame
-pygame.init()
+class Game:
+    def __init__(self):
+        # Initialize pygame
+        pygame.init()
 
-# Set the window size
-window_size = (800, 600)
+        # Set the window size
+        self.window_size = (800, 600)
 
-# Create the window
-screen = pygame.display.set_mode(window_size)
+        # Create the window
+        self.screen = pygame.display.set_mode(self.window_size)
 
-# Set the title of the window
-pygame.display.set_caption('My Game')
+        # Set the title of the window
+        pygame.display.set_caption('My Game')
 
-# Set the background color
-bg_color = (255, 255, 255)
+        # Set the background color
+        self.bg_color = (255, 255, 255)
 
-# Create the player object
-player_color = (0, 0, 0)
-player_pos = (200, 200)
-player_radius = 20
+        # Create the player object
+        self.player = Player(self)
 
-# Create a list to store the enemy objects
-enemies = []
+        # Create a list to store the enemy objects
+        self.enemies = []
 
-# Create the enemy objects
-enemy_color = (0, 100, 0)
-enemy_size = (20, 20)
+        # Create a font object
+        self.font = pygame.font.Font(None, 36)
 
-# Create a font object
-font = pygame.font.Font(None, 36)
+        # Initialize the score
+        self.score = 0
 
-# Initialize the score
-score = 0
+        # Game loop
+        self.running = True
 
-# Game loop
-running = True
-while running:
-    # Handle events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    def run(self):
+        while self.running:
+            # Handle events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
 
-    # Update the score
-    score_increased = False
+            # Update the score
+            score_increased = False
 
-    # Add new enemies to the list
-    if len(enemies) < 20:
-        enemies.append((random.randint(0, window_size[0]), random.randint(0, window_size[1])))
+            # Add new enemies to the list
+            if len(self.enemies) < 20:
+                self.enemies.append(Enemy(self))
 
-    # Get the keys that are being pressed
-    keys = pygame.key.get_pressed()
+            # Get the keys that are being pressed
+            keys = pygame.key.get_pressed()
 
-    # Update the player's position based on the keys that are being pressed
-    if keys[pygame.K_w]:
-        player_pos = (player_pos[0], player_pos[1] - 1)
-    if keys[pygame.K_s]:
-        player_pos = (player_pos[0], player_pos[1] + 1)
-    if keys[pygame.K_a]:
-        player_pos = (player_pos[0] - 1, player_pos[1])
-    if keys[pygame.K_d]:
-        player_pos = (player_pos[0] + 1, player_pos[1])
+            # Update the player's position based on the keys that are being pressed
+            self.player.update(keys)
 
-    # Draw the background
-    screen.fill(bg_color)
+            # Draw the background
+            self.screen.fill(self.bg_color)
 
-    # Draw the player
-    pygame.draw.circle(screen, player_color, player_pos, player_radius)
+            # Draw the player
+            self.player.draw()
 
-    # Draw the enemies
-    for enemy_pos in enemies:
-        pygame.draw.rect(screen, enemy_color, (enemy_pos, enemy_size))
+            # Draw the enemies
+            for enemy in self.enemies:
+                enemy.draw()
 
-        # Check if the player is colliding with the enemy
-        if pygame.Rect(enemy_pos, enemy_size).colliderect(player_pos, (player_radius*2, player_radius*2)):
-            # Swallow the enemy
-            enemies.remove(enemy_pos)
+                # Check if the player is colliding with the enemy
+                if enemy.collides_with(self.player):
+                    # Swallow the enemy
+                    self.enemies.remove(enemy)
 
-            # Increase the player's size
-            player_radius += 5
-            score += 100
-            score_increased = True
+                    # Increase the player's size
+                    self.player.radius += 5
+                    self.score += 100
+                    score_increased = True
 
-    # Check if the player has won
-    if player_radius >= min(window_size) / 2:
-        # Display end screen
-        end_color = (100, 100, 100)
-        screen.fill(end_color)
-        end_text = font.render("You won!", True, (200, 100, 100))
-        screen.blit(end_text, (window_size[0] / 2, window_size[1] / 2))
+            # Check if the player has won
+            if self.player.radius >= min(self.window_size) / 2:
+                # Display end screen
+                end_color = (100, 100, 100)
+                self.screen.fill(end_color)
+                end_text = self.font.render("You won!", True, (200, 100, 100))
+                self.screen.blit(end_text, (self.window_size[0] / 2, self.window_size[1] / 2))
 
-    # Update the score
-    if score_increased:
-        score += 1
+            # Update the score
+            if score_increased:
+                self.score += 1
 
-    # Draw the score
-    text = font.render(f"Score: {score}", True, (200, 0, 0))
-    screen.blit(text, (10, 10))
+            # Draw the score
+            text = self.font.render(f"Score: {self.score}", True, (200, 0, 0))
+            self.screen.blit(text, (10, 10))
 
-    pygame.display.update()
+            pygame.display.update()
+
+game = Game()
+game.run()
