@@ -82,6 +82,14 @@ while running:
             score += 100
             score_increased = True
 
+    # Check if the player has won
+    if player_radius >= min(window_size) / 2:
+        # Display end screen
+        end_color = (100, 100, 100)
+        screen.fill(end_color)
+        end_text = font.render("You won!", True, (200, 100, 100))
+        screen.blit(end_text, (window_size[0] / 2, window_size[1] / 2))
+
     # Update the score
     if score_increased:
         score += 1
