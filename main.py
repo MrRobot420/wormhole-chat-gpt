@@ -42,9 +42,6 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
 
-            # Update the score
-            score_increased = False
-
             # Add new enemies to the list
             if len(self.enemies) < 20:
                 self.enemies.append(Enemy(self))
@@ -73,7 +70,6 @@ class Game:
                     # Increase the player's size
                     self.player.radius += 5
                     self.score += 100
-                    score_increased = True
 
             # Check if the player has won
             if self.player.radius >= min(self.window_size) / 2:
@@ -82,10 +78,6 @@ class Game:
                 self.screen.fill(end_color)
                 end_text = self.font.render("You won!", True, (200, 100, 100))
                 self.screen.blit(end_text, (self.window_size[0] / 2, self.window_size[1] / 2))
-
-            # Update the score
-            if score_increased:
-                self.score += 1
 
             # Draw the score
             text = self.font.render(f"Score: {self.score}", True, (200, 0, 0))
